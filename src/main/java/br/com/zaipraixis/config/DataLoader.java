@@ -20,6 +20,12 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+
+        if (consultorRepository.count() > 0) {
+            System.out.println("[seed:dev] Dados já existentes — pulando carga inicial.");
+            return;
+        }
+
 //        System.out.println("[CLEANUP] limpando o documento");
 //        consultorRepository.deleteAll();
 

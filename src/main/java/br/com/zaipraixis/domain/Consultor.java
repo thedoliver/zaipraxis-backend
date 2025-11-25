@@ -1,5 +1,6 @@
 package br.com.zaipraixis.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,6 +17,7 @@ public class Consultor {
     private String telefone;
     private String email;
     private String areaEspecializacao;
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataCriacao;
 
     public Consultor() {}

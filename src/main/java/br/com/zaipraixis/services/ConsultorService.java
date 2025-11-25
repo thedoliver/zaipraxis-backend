@@ -3,10 +3,9 @@ package br.com.zaipraixis.services;
 import br.com.zaipraixis.domain.Consultor;
 import br.com.zaipraixis.dtos.ConsultorDTO;
 import br.com.zaipraixis.repositories.ConsultorRepository;
+import br.com.zaipraixis.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,27 +28,27 @@ public class ConsultorService {
 
     public ConsultorDTO findById(String id) {
         Consultor consultor = consultorRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Consultor não encontrado"
-                ));
+                .orElseThrow(() ->
+                        new ObjectNotFoundException("Consultor não encontrado! Id: " + id)
+                );
         return toDTO(consultor);
     }
 
 
     public ConsultorDTO create(ConsultorDTO dto) {
         Consultor consultor = toEntity(dto);
-        consultor.setId(null); // garante que o mongo gere o ObjectId
+        consultor.setId(null); // garante que o Mongo vai gerar um ObjectId novo
         consultor.setDataCriacao(LocalDate.now());
         Consultor saved = consultorRepository.save(consultor);
         return toDTO(saved);
     }
 
-    // 🔹 Atualizar
+
     public ConsultorDTO update(String id, ConsultorDTO dto) {
         Consultor existing = consultorRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Consultor não encontrado"
-                ));
+                .orElseThrow(() ->
+                        new ObjectNotFoundException("Consultor não encontrado! Id: " + id)
+                );
 
         existing.setNome(dto.getNome());
         existing.setTelefone(dto.getTelefone());
@@ -63,11 +62,11 @@ public class ConsultorService {
 
     public void delete(String id) {
         if (!consultorRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Consultor não encontrado");
+            throw new ObjectNotFoundException("Consultor não encontrado! Id: " + id);
         }
         consultorRepository.deleteById(id);
     }
+
 
     private ConsultorDTO toDTO(Consultor entity) {
         return new ConsultorDTO(

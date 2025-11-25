@@ -1,0 +1,11 @@
+services:
+  api:
+    build: .
+    image: zaipraxis-backend:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      MONGODB_URI: ${MONGODB_URI}
+
+    restart: unless-stopped

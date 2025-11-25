@@ -1,32 +1,19 @@
-FROM maven:3.9-eclipse-temurin-21-alpine AS builder
-
+# === Build (Maven) ===
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
-
-# Copia apenas o pom primeiro (cache de dependências)
 COPY pom.xml .
-
-# Baixa as dependências (sem compilar ainda)
-RUN mvn -q -DskipTests dependency:go-offline
-
-# Agora copia o código fonte
+RUN mvn -q -e -DskipTests dependency:go-offline
 COPY src ./src
+RUN mvn -q -e -DskipTests package
 
-# Build do jar (sem testes para acelerar)
-RUN mvn -q clean package -DskipTests
-
+# === Run (JRE) ===
 FROM eclipse-temurin:21-jre-alpine
-
 WORKDIR /app
+# jar final (ajuste o nome se diferente)
+COPY --from=build /app/target/*-SNAPSHOT.jar app.jar
 
-# Copia o jar gerado do stage de build
-COPY --from=builder /app/target/zaipraxis-backend-0.0.1-SNAPSHOT.jar app.jar
-
-# Porta padrão do Spring Boot
-EXPOSE 8080
-
-# Perfil default (ajusta se quiser usar "dev")
-ENV SPRING_PROFILES_ACTIVE=dev
+# Profile dev por padrão; a URL virá de MONGO_URI
+ENV SPRING_PROFILES_ACTIVE=$dev
 ENV MONGODB_URI=${MONGODB_URI}
-
-# Comando de entrada
-ENTRYPOINT ["sh", "-c", "java $MONGODB_URI-jar app.jar"]
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]

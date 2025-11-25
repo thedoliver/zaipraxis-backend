@@ -1,5 +1,6 @@
 package br.com.zaipraixis.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,7 +24,8 @@ public class ConsultorDTO {
     @NotBlank(message = "A área de especialização não pode ser vazia")
     private String areaEspecializacao;
 
-    private LocalDate dataCriacao;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate dataCriacao = LocalDate.now();
 
     public ConsultorDTO() {}
 
